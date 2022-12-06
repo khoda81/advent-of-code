@@ -1,0 +1,9 @@
+{
+    "jupyter.jupyterServerType": "local",
+    "editor.tabCompletion": "on",
+    "diffEditor.codeLens": true,
+    "cSpell.words": [
+        "aocd"
+    ],
+    "python.analysis.typeCheckingMode": "basic"
+}
