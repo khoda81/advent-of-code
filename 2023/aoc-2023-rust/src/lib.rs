@@ -7,6 +7,7 @@ use std::{
 
 use anyhow::Context;
 use strum_macros::EnumIter;
+use thiserror::Error;
 
 pub mod solutions;
 
@@ -67,6 +68,10 @@ impl Display for Day {
 type PuzzleOutput = u32;
 type PuzzleResult = anyhow::Result<PuzzleOutput>;
 
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Error)]
+#[error("the solution for {0} is not implemented yet")]
+struct UnimplementedSolution(Day);
+
 impl Day {
     pub fn number(self) -> u8 {
         self as u8
@@ -94,15 +99,12 @@ impl Day {
     }
 
     fn solve_with_input<I: BufRead>(&self, buf_reader: I, part: Part) -> PuzzleResult {
-        self.solver_fn()(buf_reader, part)
-    }
-
-    pub fn solver_fn<I: BufRead>(&self) -> fn(I, Part) -> PuzzleResult {
         match self {
-            Day::One => solutions::day_1::main,
-            Day::Two => solutions::day_2::main,
-            Day::Three => solutions::day_3::main,
-            _ => todo!(),
+            Day::One => solutions::day_1::main(buf_reader, part),
+            Day::Two => solutions::day_2::main(buf_reader, part),
+            Day::Three => solutions::day_3::main(buf_reader, part),
+            Day::Four => solutions::day_4::main(buf_reader, part),
+            _ => Err(UnimplementedSolution(*self).into()),
         }
     }
 }
