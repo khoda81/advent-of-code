@@ -8,9 +8,7 @@ use std::{
 use anyhow::Context;
 use strum_macros::EnumIter;
 
-pub mod day_1;
-pub mod day_2;
-pub mod day_3;
+pub mod solutions;
 
 pub const INPUT_FILES_PATH: &str = r"..";
 
@@ -101,9 +99,9 @@ impl Day {
 
     pub fn solver_fn<I: BufRead>(&self) -> fn(I, Part) -> PuzzleResult {
         match self {
-            Day::One => day_1::main,
-            Day::Two => day_2::main,
-            Day::Three => day_3::main,
+            Day::One => solutions::day_1::main,
+            Day::Two => solutions::day_2::main,
+            Day::Three => solutions::day_3::main,
             _ => todo!(),
         }
     }
