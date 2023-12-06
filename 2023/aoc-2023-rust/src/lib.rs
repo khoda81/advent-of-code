@@ -6,6 +6,7 @@ use std::{
 
 pub mod day_1;
 pub mod day_2;
+pub mod day_3;
 
 pub const INPUT_FILES_PATH: &str = r"../";
 
@@ -47,6 +48,9 @@ pub enum Day {
     TwentyFive = 25,
 }
 
+type PuzzleOutput = u32;
+type PuzzleResult = anyhow::Result<PuzzleOutput>;
+
 impl Day {
     fn number(&self) -> u8 {
         *self as u8
@@ -56,15 +60,16 @@ impl Day {
         PathBuf::from_iter([INPUT_FILES_PATH, &self.number().to_string(), "input.txt"])
     }
 
-    pub fn get_solution<I: BufRead>(&self) -> fn(I, Part) -> anyhow::Result<isize> {
+    pub fn get_solution<I: BufRead>(&self) -> fn(I, Part) -> PuzzleResult {
         match self {
             Day::One => day_1::main,
             Day::Two => day_2::main,
+            Day::Three => day_3::main,
             _ => todo!(),
         }
     }
 
-    pub fn solve(&self, part: Part) -> anyhow::Result<isize> {
+    pub fn solve(&self, part: Part) -> PuzzleResult {
         let path = self.input_path();
         let input_file = File::open(path)?;
         let buf_reader = BufReader::new(input_file);

@@ -2,9 +2,9 @@ use regex::Regex;
 use std::io::BufRead;
 use thiserror::Error;
 
-use crate::Part;
+use crate::{Part, PuzzleOutput, PuzzleResult};
 
-pub fn main<I: BufRead>(buf_reader: I, part: Part) -> anyhow::Result<isize> {
+pub fn main<I: BufRead>(buf_reader: I, part: Part) -> PuzzleResult {
     let mut total = 0;
     for line in buf_reader.lines() {
         let line = line?;
@@ -16,10 +16,10 @@ pub fn main<I: BufRead>(buf_reader: I, part: Part) -> anyhow::Result<isize> {
         };
 
         let num = first * 10 + last;
-        total += num as isize;
+        total += num as u32;
     }
 
-    Ok(total)
+    Ok(PuzzleOutput::try_from(total)?)
 }
 
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Error)]
@@ -31,22 +31,21 @@ fn extract_digits_part_1(line: &str) -> anyhow::Result<[u8; 2]> {
 
     let first = digits.next().ok_or(NoDigitsInStr)?;
     let last = digits.last().unwrap_or(first);
-    let result = [first, last].map(|d| d.to_string().parse().unwrap());
+    let [first, last] = [first, last].map(|d| d.to_string());
 
-    Ok(result)
+    Ok([first.as_str(), last.as_str()].map(digit_to_int))
 }
 
 fn extract_digits_part_2(line: &str) -> anyhow::Result<[u8; 2]> {
     let forward_re = Regex::new(r"([1-9]|one|two|three|four|five|six|seven|eight|nine)").unwrap();
     let backward_re = Regex::new(r"([1-9]|enin|thgie|neves|xis|evif|ruof|eerht|owt|eno)").unwrap();
 
-    let first = forward_re.find(line).ok_or(NoDigitsInStr)?;
-    let first = &line[first.range()];
+    let first = forward_re.find(line).ok_or(NoDigitsInStr)?.as_str();
 
     let reversed_line: String = line.chars().rev().collect();
     let last = backward_re
         .find(&reversed_line)
-        .map(|m| reversed_line[m.range()].chars().rev().collect::<String>());
+        .map(|m| m.as_str().chars().rev().collect::<String>());
 
     let last = last.as_deref().unwrap_or(first);
 

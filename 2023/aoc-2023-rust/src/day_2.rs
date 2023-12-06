@@ -2,7 +2,7 @@ use anyhow::Ok;
 use regex::Regex;
 use std::io::BufRead;
 
-use crate::Part;
+use crate::{Part, PuzzleOutput, PuzzleResult};
 
 #[derive(Debug)]
 struct Bag {
@@ -11,7 +11,7 @@ struct Bag {
     red: u32,
 }
 
-pub fn main<I: BufRead>(buf_reader: I, part: Part) -> anyhow::Result<isize> {
+pub fn main<I: BufRead>(buf_reader: I, part: Part) -> PuzzleResult {
     let mut total = 0;
     for line in buf_reader.lines() {
         let line = line?;
@@ -20,20 +20,18 @@ pub fn main<I: BufRead>(buf_reader: I, part: Part) -> anyhow::Result<isize> {
         let (game_id, bags) = parse_line(line)?;
         if let Part::One = part {
             if bags.iter().all(is_possible) {
-                total += game_id as isize;
+                total += game_id as u32;
             }
         } else {
             let max_blues = bags.iter().map(|bag| bag.blue).max().unwrap();
             let max_greens = bags.iter().map(|bag| bag.green).max().unwrap();
             let max_reds = bags.iter().map(|bag| bag.red).max().unwrap();
 
-            let power_set = max_blues * max_greens * max_reds;
-
-            total += power_set as isize;
+            total += max_blues * max_greens * max_reds;
         }
     }
 
-    Ok(total)
+    Ok(PuzzleOutput::try_from(total)?)
 }
 
 fn is_possible(bag: &Bag) -> bool {
