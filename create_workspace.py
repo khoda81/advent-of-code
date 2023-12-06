@@ -54,7 +54,7 @@ def main(args: argparse.Namespace) -> None:
         # write input data to input.txt
         input_path = path / "input.txt"
         input_path.write_text(input_data)
-    
+
     log.info("done")
 
 

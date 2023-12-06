@@ -1,11 +1,5 @@
-import collections
-import itertools
-import math
-import os
-from pathlib import Path
-import re
 import sys
-
+from pathlib import Path
 
 INPUT_FILE = Path(__file__).parent / "input(1).txt"
 
@@ -17,7 +11,8 @@ def main() -> None:
         solution(sys.stdin)
     else:
         with open(INPUT_FILE, "r") as f:
-           solution(f)
+            solution(f)
+
 
 def solution(inp):
     result = 0
@@ -31,7 +26,7 @@ def solution(inp):
         line, next_line = next_line, next(inp)
 
         for i, stack in enumerate(stacks):
-            item = line[4*i + 1]
+            item = line[4 * i + 1]
 
             if item != ' ':
                 stacks[i].append(item)
@@ -40,7 +35,7 @@ def solution(inp):
         stack.reverse()
 
     for line in inp:
-        _, count, _, from_,_, to_ = line.split(" ")
+        _, count, _, from_, _, to_ = line.split(" ")
         count = int(count)
         from_ = int(from_) - 1
         to_ = int(to_) - 1

@@ -1,11 +1,5 @@
-import collections
-import itertools
-import math
-import os
-from pathlib import Path
-import re
 import sys
-
+from pathlib import Path
 
 INPUT_FILE = Path(__file__).parent / "input.txt"
 
@@ -17,12 +11,13 @@ def main() -> None:
         solution(sys.stdin)
     else:
         with open(INPUT_FILE, "r") as f:
-           solution(f)
+            solution(f)
+
 
 def solution(inp):
     for line in inp:
         for i in range(4, len(line)):
-            if len(set(line[i-14:i])) == 14:
+            if len(set(line[i - 14:i])) == 14:
                 print(i)
                 break
 

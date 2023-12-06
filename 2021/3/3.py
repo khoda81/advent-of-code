@@ -13,6 +13,7 @@ inp = [
     "01010"
 ]
 
+
 # with open("input3.txt") as f:
 #     inp = f.read().splitlines()
 
@@ -38,7 +39,6 @@ while len(things) > 1:
     on, off = categorize(0, things)
     if len(on) >= len(off):
         things = on
-
 
 # gamma_bits = [count_bits(i, inp) for i in range(5)]
 

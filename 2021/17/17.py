@@ -1,6 +1,3 @@
-from collections import defaultdict
-
-
 def solution(target_x_range: range, target_y_range: range):
     tx_range = range(target_x_range.start, target_x_range.stop + 1)
     ty_range = range(target_y_range.start, target_y_range.stop + 1)
@@ -12,9 +9,9 @@ def solution(target_x_range: range, target_y_range: range):
             # print("testing", svx, svy)
             if svx * (svx + 1) // 2 < target_x_range.start:
                 continue
-            
+
             # print("simulating", vx, vy)
-        
+
             x, y = 0, 0
             vx, vy = svx, svy
             min_x, max_x = 0, tx_range.stop
@@ -28,13 +25,14 @@ def solution(target_x_range: range, target_y_range: range):
 
                 min_x = min(min_x, x)
                 max_y = max(max_y, y)
-                
+
                 if x in tx_range and y in ty_range:
                     count += 1
                     answer = max(answer, max_y)
                     # print(svx, svy)
                     break
     print(answer, count)
+
 
 # visualize((6, 5), range(20, 30), range(-10, -5))
 # target area: x=124..174, y=-123..-86
@@ -43,6 +41,7 @@ def solution(target_x_range: range, target_y_range: range):
 def main():
     # solution(range(20, 30), range(-10, -5))
     solution(range(124, 174), range(-123, -86))
+
 
 if __name__ == "__main__":
     main()

@@ -1,13 +1,13 @@
-from collections import defaultdict
 from pathlib import Path
 from pprint import pprint
 
-
 PATH = Path("2021")
+
 
 def main():
     categorize()
     # remove_empty_dirs()
+
 
 def remove_empty_dirs(path=PATH):
     for day in path.iterdir():
@@ -20,13 +20,14 @@ def remove_empty_dirs(path=PATH):
             day.rmdir()
             print(f"Removing {day}")
 
+
 def categorize(path=PATH):
-    files  = {x for x in path.iterdir() if x.is_file()}
+    files = {x for x in path.iterdir() if x.is_file()}
     buckets = {}
 
     for i in range(25, 0, -1):
-        bucket = {x for x in files  if f"{i}" in x.name}
-        files  = files - bucket
+        bucket = {x for x in files if f"{i}" in x.name}
+        files = files - bucket
         buckets[i] = bucket
 
     pprint(buckets)
@@ -38,6 +39,7 @@ def categorize(path=PATH):
 
         for file in files:
             file.rename(day_path / file.name)
+
 
 if __name__ == "__main__":
     main()

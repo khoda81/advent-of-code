@@ -3,9 +3,11 @@
 ## USAGE
 
 1. Clone the repo.
-2. Replace `TOKEN` in `./.env` file with advent of code session id ([how to get](https://github.com/wimglenn/advent-of-code-wim/issues/1)).
+2. Replace `TOKEN` in `./.env` file with advent of code session
+   id ([how to get](https://github.com/wimglenn/advent-of-code-wim/issues/1)).
 
-This token is used to automatically get personal inputs from advent of code server. You can disable this in by passing --no-input to create-workspace. DO NOT COMMIT THIS TOKEN TO A PUBLIC REPOSITORY.
+This token is used to automatically get personal inputs from advent of code server. You can disable this in by passing
+--no-input to create-workspace. DO NOT COMMIT THIS TOKEN TO A PUBLIC REPOSITORY.
 
 ## Files
 
@@ -18,4 +20,5 @@ This token is used to automatically get personal inputs from advent of code serv
 
 - `organize.py`: helper for organizing messy solution files into `{year}/{day}` format.
 
-Run boilerplate.py with --tomorrow a few minutes before the puzzle. Then open the website, wait until its unlocked. When you're done reading the puzzle, solution boilerplate and input file are ready in the folder for you.
+Run boilerplate.py with --tomorrow a few minutes before the puzzle. Then open the website, wait until its unlocked. When
+you're done reading the puzzle, solution boilerplate and input file are ready in the folder for you.

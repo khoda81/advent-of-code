@@ -6,8 +6,8 @@ def main() -> None:
 
     for line in sys.stdin:
         first, second = line.split(',')
-        a1,b1 = map(int, first.split("-"))
-        a2,b2 = map(int, second.split("-"))
+        a1, b1 = map(int, first.split("-"))
+        a2, b2 = map(int, second.split("-"))
         # print(a1, a2, b1, b2)
 
         a = range(a1, b1 + 1)

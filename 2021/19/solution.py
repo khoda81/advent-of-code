@@ -1,11 +1,5 @@
-import collections
-import itertools
-import math
-import os
-from pathlib import Path
-import re
 import sys
-
+from pathlib import Path
 
 INPUT_FILE = Path(__file__).parent / "input.txt"
 
@@ -17,7 +11,8 @@ def main() -> None:
         solution(sys.stdin)
     else:
         with open(INPUT_FILE, "r") as f:
-           solution(f)
+            solution(f)
+
 
 def solution(inp):
     result = 0

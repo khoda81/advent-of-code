@@ -1,2 +1,3 @@
 advent-of-code-data
+more-itertools
 dotenv

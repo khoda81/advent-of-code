@@ -11,10 +11,10 @@ def main():
         outcome = (b + a) % 3
         outcome_type = (b - 1) % 3
         score = outcome + outcome_type * 3 + 1
-        
+
         print(score, outcome, a, b)
         total += score
-    
+
     print(total)
 
 

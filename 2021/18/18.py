@@ -32,10 +32,10 @@ class Tree:
 
     def __eq__(self, other):
         return (
-            other is not None and
-            self.value == other.value and
-            self.left == other.left and
-            self.right == other.right
+                other is not None and
+                self.value == other.value and
+                self.left == other.left and
+                self.right == other.right
         )
 
     def copy(self):
@@ -81,7 +81,7 @@ def explode(tree, left=None, right=None, depth=0):
 
         return True
 
-    return explode(tree.left, left, tree.right, depth+1) or explode(tree.right, tree.left, right, depth+1)
+    return explode(tree.left, left, tree.right, depth + 1) or explode(tree.right, tree.left, right, depth + 1)
 
 
 def split(tree):
@@ -133,7 +133,7 @@ def magnitude(tree):
     if tree.left is None:
         return tree.value
 
-    return 3*magnitude(tree.left) + 2*magnitude(tree.right)
+    return 3 * magnitude(tree.left) + 2 * magnitude(tree.right)
 
 
 nums = """

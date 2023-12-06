@@ -21,7 +21,7 @@ def solution(inp):
     items = []
 
     for line in inp:
-        print(line, end="")
+        print(line)
         result += 1
 
     print(result)

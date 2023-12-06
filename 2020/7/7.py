@@ -16,11 +16,13 @@ def parse_line(line):
 with open("7.txt") as f:
     graph = dict(parse_line(line) for line in f.readlines())
 
+
     def dfs(node):
         return sum(
             (1 + dfs(color)) * count
             for color, count
             in graph[node].items()
         )
+
 
     print(dfs("shiny gold"))
