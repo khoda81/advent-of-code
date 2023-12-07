@@ -69,8 +69,8 @@ pub type PuzzleOutput = u32;
 pub type PuzzleResult = anyhow::Result<PuzzleOutput>;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Error)]
-#[error("the solution for {0} is not implemented yet")]
-pub struct UnimplementedSolution(Day);
+#[error("the solution for {0}>{1} is not implemented yet")]
+pub struct UnimplementedSolution(Day, Part);
 
 impl Day {
     pub fn number(self) -> u8 {
@@ -91,7 +91,7 @@ impl Day {
                 Err(err) => format!("Failed: {err}"),
             };
 
-            format!("while opening file \"{path}\" (cwd: \"{cwd}\")")
+            format!("failed to open file \"{path}\" (cwd: \"{cwd}\")")
         })?;
 
         let buf_reader = BufReader::new(input_file);
@@ -104,8 +104,9 @@ impl Day {
             Day::Two => solutions::day_2::main(buf_reader, part),
             Day::Three => solutions::day_3::main(buf_reader, part),
             Day::Four => solutions::day_4::main(buf_reader, part),
+            Day::Five => solutions::day_5::main(buf_reader, part),
             Day::Seven => solutions::day_7::main(buf_reader, part),
-            _ => Err(UnimplementedSolution(*self).into()),
+            _ => Err(UnimplementedSolution(*self, part).into()),
         }
     }
 }
