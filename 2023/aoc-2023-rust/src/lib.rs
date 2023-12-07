@@ -65,12 +65,12 @@ impl Display for Day {
     }
 }
 
-type PuzzleOutput = u32;
-type PuzzleResult = anyhow::Result<PuzzleOutput>;
+pub type PuzzleOutput = u32;
+pub type PuzzleResult = anyhow::Result<PuzzleOutput>;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Error)]
 #[error("the solution for {0} is not implemented yet")]
-struct UnimplementedSolution(Day);
+pub struct UnimplementedSolution(Day);
 
 impl Day {
     pub fn number(self) -> u8 {
@@ -104,6 +104,7 @@ impl Day {
             Day::Two => solutions::day_2::main(buf_reader, part),
             Day::Three => solutions::day_3::main(buf_reader, part),
             Day::Four => solutions::day_4::main(buf_reader, part),
+            Day::Seven => solutions::day_7::main(buf_reader, part),
             _ => Err(UnimplementedSolution(*self).into()),
         }
     }

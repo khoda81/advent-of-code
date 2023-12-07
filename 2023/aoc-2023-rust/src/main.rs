@@ -5,7 +5,7 @@ use strum::IntoEnumIterator;
 
 fn main() -> anyhow::Result<()> {
     Day::iter()
-        .skip(3)
+        .skip(6)
         .take(1)
         .flat_map(|day| {
             println!("{day:-^20}");
