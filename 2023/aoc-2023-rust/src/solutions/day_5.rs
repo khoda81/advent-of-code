@@ -7,6 +7,10 @@ use thiserror::Error;
 
 use crate::{Part, PuzzleResult};
 
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Error)]
+#[error("there was an un even number of seeds (num seeds: {0})")]
+pub struct UnEvenSeedCount(usize);
+
 type Range<T> = RangeInclusive<T>;
 
 pub fn main<I: BufRead>(mut input: I, part: Part) -> PuzzleResult {
@@ -18,7 +22,8 @@ pub fn main<I: BufRead>(mut input: I, part: Part) -> PuzzleResult {
             .chunks_exact(2)
             .map(<[_; 2]>::try_from)
             .map(|arr| arr.map(|[a, b]| a..=a + b - 1))
-            .collect::<Result<_, _>>()?,
+            .collect::<Result<_, _>>()
+            .map_err(|_| UnEvenSeedCount(numbers.len()))?,
     };
 
     while let CF::Continue(mapping_info) = read_mapping(&mut input)
@@ -32,12 +37,7 @@ pub fn main<I: BufRead>(mut input: I, part: Part) -> PuzzleResult {
         let (_name1, _name2, mut mappings) = mapping_info;
         mappings.sort_by_key(|map| map.start1);
 
-        ranges = apply_mappings(ranges, &mappings)
-            .filter(|range| !range.is_empty())
-            .collect();
-
-        // TODO remove
-        // ranges.sort_by_key(|seed| *seed.start());
+        ranges = apply_mappings(ranges, &mappings).collect();
     }
 
     let result = ranges
@@ -50,26 +50,24 @@ pub fn main<I: BufRead>(mut input: I, part: Part) -> PuzzleResult {
 }
 
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]
-struct Mapping {
+pub struct Shift {
     start1: u32,
     start2: u32,
     size: u32,
 }
 
-impl Mapping {
-    fn map_num(&self, inp: u32) -> Option<u32> {
+impl Shift {
+    pub fn map_num(&self, inp: u32) -> Option<u32> {
         (self.input_range())
             .contains(&inp)
             .then(|| self.map_num_unchecked(inp))
     }
 
-    fn map_num_unchecked(&self, inp: u32) -> u32 {
-        ((inp as u64 + self.start2 as u64) - self.start1 as u64)
-            .try_into()
-            .unwrap()
+    pub fn map_num_unchecked(&self, inp: u32) -> u32 {
+        inp.wrapping_add(self.start2).wrapping_sub(self.start1)
     }
 
-    fn map_range(&self, range: Range<u32>) -> (Range<u32>, [Range<u32>; 2]) {
+    pub fn map_range(&self, range: Range<u32>) -> (Range<u32>, [Range<u32>; 2]) {
         let input_range = self.input_range();
 
         let &is = input_range.start();
@@ -95,20 +93,20 @@ impl Mapping {
         let overlap_start = rs.max(is);
         let overlap_end = re.min(ie);
         if !(overlap_start..=overlap_end).is_empty() {
-            let mapped_start = self.map_num(overlap_start).expect("start was not in range");
-            let mapped_end = self.map_num(overlap_end).expect("end was not in range");
+            let mapped_start = self.map_num_unchecked(overlap_start);
+            let mapped_end = self.map_num_unchecked(overlap_end);
             mapped = mapped_start..=mapped_end;
         }
 
         (mapped, [piece_1, piece_2])
     }
 
-    fn input_range(&self) -> Range<u32> {
+    pub fn input_range(&self) -> Range<u32> {
         self.start1..=self.start1 + (self.size - 1)
     }
 }
 
-impl Display for Mapping {
+impl Display for Shift {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let buf = format!(
             "{:?}->{}",
@@ -121,38 +119,26 @@ impl Display for Mapping {
 
 fn apply_mappings(
     numbers: Vec<Range<u32>>,
-    mappings: &[Mapping],
+    mappings: &[Shift],
 ) -> impl Iterator<Item = Range<u32>> + '_ {
-    numbers.into_iter().flat_map(move |mut range| {
-        // println!("working on {range:?}");
-        let mut results = vec![];
+    numbers
+        .into_iter()
+        .flat_map(move |range| {
+            let mut remained = range;
+            let mut results = vec![];
 
-        for mapping in mappings {
-            if range.is_empty() {
-                return results;
+            for mapping in mappings {
+                let (mapped, passed);
+
+                (mapped, [passed, remained]) = mapping.map_range(remained.clone());
+                results.extend([passed, mapped])
             }
 
-            let (mapped, [piece1, piece2]) = mapping.map_range(range.clone());
-            // println!(
-            //     "mapped {mapped:?} {}",
-            //     if mapped.is_empty() { "(empty)" } else { "" }
-            // );
-            // println!(
-            //     "piece1 {piece1:?} {}",
-            //     if piece1.is_empty() { "(empty)" } else { "" }
-            // );
-            // println!(
-            //     "piece2 {piece2:?} {}",
-            //     if piece2.is_empty() { "(empty)" } else { "" }
-            // );
-            range = piece2;
-            results.extend([mapped, piece1])
-        }
+            results.push(remained);
 
-        results.push(range);
-
-        results
-    })
+            results
+        })
+        .filter(|range| !range.is_empty())
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Error)]
@@ -186,7 +172,7 @@ fn read_numbers<I: BufRead>(input: &mut I) -> anyhow::Result<Vec<u32>> {
     Ok(collect)
 }
 
-fn read_mapping<I: BufRead>(input: &mut I) -> anyhow::Result<(String, String, Vec<Mapping>)> {
+fn read_mapping<I: BufRead>(input: &mut I) -> anyhow::Result<(String, String, Vec<Shift>)> {
     let mut chunk = read_chunk(input);
     let first = chunk.next().ok_or(ReachedEndOfInput)??;
 
@@ -194,10 +180,10 @@ fn read_mapping<I: BufRead>(input: &mut I) -> anyhow::Result<(String, String, Ve
     let (name1, name2) = names.split_once("-to-").unwrap();
 
     let mappings = chunk
-        .map(|line| -> anyhow::Result<Mapping> {
+        .map(|line| -> anyhow::Result<Shift> {
             let line = line?;
             let mut numbers = line.split_whitespace().map(|num| num.parse());
-            Ok(Mapping {
+            Ok(Shift {
                 start2: numbers.next().unwrap()?,
                 start1: numbers.next().unwrap()?,
                 size: numbers.next().unwrap()?,
