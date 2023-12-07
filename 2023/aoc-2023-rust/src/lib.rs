@@ -105,6 +105,7 @@ impl Day {
             Day::Three => solutions::day_3::main(buf_reader, part),
             Day::Four => solutions::day_4::main(buf_reader, part),
             Day::Five => solutions::day_5::main(buf_reader, part),
+            Day::Six => solutions::day_6::main(buf_reader, part),
             Day::Seven => solutions::day_7::main(buf_reader, part),
             _ => Err(UnimplementedSolution(*self, part).into()),
         }

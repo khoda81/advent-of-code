@@ -3,8 +3,8 @@ use thiserror::Error;
 
 use crate::{Part, PuzzleResult};
 
-pub fn main<I: BufRead>(buf_reader: I, part: Part) -> PuzzleResult {
-    let cards: Vec<_> = buf_reader
+pub fn main<I: BufRead>(input: I, part: Part) -> PuzzleResult {
+    let cards: Vec<_> = input
         .lines()
         .map(|line| {
             let line = line?;

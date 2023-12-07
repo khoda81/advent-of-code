@@ -5,17 +5,15 @@ use strum::IntoEnumIterator;
 
 fn main() -> anyhow::Result<()> {
     Day::iter()
-        // .skip(4)
-        // .take(1)
+        .skip(5)
+        .take(1)
         .flat_map(|day| {
-            println!("{day:-^20}");
+            println!("{day:-^30}");
             iter::repeat(day).zip(Part::iter())
         })
         .try_for_each(|(day, part)| {
-            let result = day.solve(part).map(|result| println!("{part}: {result}"));
-
-            match result {
-                Ok(()) => {}
+            match day.solve(part) {
+                Ok(result) => println!("{part}: {result}"),
                 Err(err) => eprintln!("Error: {err}"),
             };
 
