@@ -17,9 +17,9 @@ enum GearStatus {
     Bust,
 }
 
-pub fn main<I: BufRead>(buf_reader: I, part: Part) -> PuzzleResult {
+pub fn main<I: BufRead>(input: I, part: Part) -> PuzzleResult {
     let mut total = 0;
-    let object_rows = buf_reader
+    let object_rows = input
         .lines()
         .map(|line| {
             let line = line?;

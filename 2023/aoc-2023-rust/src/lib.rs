@@ -69,7 +69,7 @@ pub type PuzzleOutput = u32;
 pub type PuzzleResult = anyhow::Result<PuzzleOutput>;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Error)]
-#[error("the solution for {0}>{1} is not implemented yet")]
+#[error("the solution for {}-{} is not implemented yet", self.0 as u8, self.1 as u8)]
 pub struct UnimplementedSolution(Day, Part);
 
 impl Day {
@@ -98,15 +98,17 @@ impl Day {
         self.solve_with_input(buf_reader, part)
     }
 
-    fn solve_with_input<I: BufRead>(&self, buf_reader: I, part: Part) -> PuzzleResult {
+    fn solve_with_input<I: BufRead>(&self, input: I, part: Part) -> PuzzleResult {
         match self {
-            Day::One => solutions::day_1::main(buf_reader, part),
-            Day::Two => solutions::day_2::main(buf_reader, part),
-            Day::Three => solutions::day_3::main(buf_reader, part),
-            Day::Four => solutions::day_4::main(buf_reader, part),
-            Day::Five => solutions::day_5::main(buf_reader, part),
-            Day::Six => solutions::day_6::main(buf_reader, part),
-            Day::Seven => solutions::day_7::main(buf_reader, part),
+            Day::One => solutions::day_1::main(input, part),
+            Day::Two => solutions::day_2::main(input, part),
+            Day::Three => solutions::day_3::main(input, part),
+            Day::Four => solutions::day_4::main(input, part),
+            Day::Five => solutions::day_5::main(input, part),
+            Day::Six => solutions::day_6::main(input, part),
+            Day::Seven => solutions::day_7::main(input, part),
+            Day::Eight => solutions::day_8::main(input, part),
+
             _ => Err(UnimplementedSolution(*self, part).into()),
         }
     }

@@ -11,9 +11,9 @@ struct Bag {
     red: u32,
 }
 
-pub fn main<I: BufRead>(buf_reader: I, part: Part) -> PuzzleResult {
+pub fn main<I: BufRead>(input: I, part: Part) -> PuzzleResult {
     let mut total = 0;
-    for line in buf_reader.lines() {
+    for line in input.lines() {
         let line = line?;
         let line = line.trim();
 
