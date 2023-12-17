@@ -65,8 +65,7 @@ impl Display for Day {
     }
 }
 
-// pub type PuzzleOutput = u64;
-pub type PuzzleResult = anyhow::Result<u64>;
+pub type PuzzleResult = anyhow::Result<String>;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Error)]
 #[error("the solution for {}-{} is not implemented yet", self.0 as u8, self.1 as u8)]

@@ -99,7 +99,7 @@ pub fn main<I: BufRead>(input: I, part: Part) -> PuzzleResult {
         total += ratio;
     }
 
-    Ok(total.into())
+    Ok(total.to_string())
 }
 
 fn parse_line(line: &str) -> anyhow::Result<Vec<(usize, Object)>> {

@@ -45,7 +45,7 @@ pub fn main<I: BufRead>(mut input: I, part: Part) -> PuzzleResult {
         .min()
         .expect("no seeds remaining");
 
-    Ok(result.into())
+    Ok(result.to_string())
 }
 
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]

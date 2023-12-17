@@ -28,7 +28,7 @@ pub fn main<I: BufRead>(input: I, part: Part) -> PuzzleResult {
         }
     };
 
-    Ok(total.into())
+    Ok(total.to_string())
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Eq)]

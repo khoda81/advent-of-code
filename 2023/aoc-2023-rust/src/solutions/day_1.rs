@@ -19,7 +19,7 @@ pub fn main<I: BufRead>(input: I, part: Part) -> PuzzleResult {
         total += num as u32;
     }
 
-    Ok(total.into())
+    Ok(total.to_string())
 }
 
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Error)]

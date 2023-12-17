@@ -18,7 +18,7 @@ pub fn main<I: BufRead>(input: I, part: Part) -> PuzzleResult {
         })
         .product();
 
-    Ok(total.into())
+    Ok(total.to_string())
 }
 
 fn parse_line(line: String, part: Part) -> Result<Vec<u64>, anyhow::Error> {

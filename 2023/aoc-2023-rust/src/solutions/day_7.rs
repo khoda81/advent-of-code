@@ -33,7 +33,7 @@ pub fn main<I: BufRead>(input: I, part: Part) -> PuzzleResult {
 
     let total: u32 = (1..).zip(hands).map(|(rank, (_, _, bid))| rank * bid).sum();
 
-    Ok(total.into())
+    Ok(total.to_string())
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]

@@ -121,7 +121,7 @@ fn part_1(instructions: Vec<parser::Instruction>, graph: HashMap<String, Edges>)
     }
 
     // 17873
-    Ok(count as u64)
+    Ok(count.to_string())
 }
 
 fn part_2(instructions: Vec<parser::Instruction>, graph: HashMap<String, Edges>) -> PuzzleResult {
@@ -159,7 +159,7 @@ fn part_2(instructions: Vec<parser::Instruction>, graph: HashMap<String, Edges>)
 
     let result = lcm * instructions.len();
     // 15746133679061
-    Ok(result as u64)
+    Ok(result.to_string())
 }
 
 fn parse_graph<I: BufRead>(input: I) -> anyhow::Result<HashMap<String, Edges>> {
