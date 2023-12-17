@@ -11,7 +11,7 @@ use thiserror::Error;
 
 pub mod solutions;
 
-pub const INPUT_FILES_PATH: &str = r"..";
+pub const INPUT_FILES_PATH: &str = r"..\2023";
 
 #[repr(u8)]
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, EnumIter)]
@@ -108,6 +108,7 @@ impl Day {
             Day::Seven => solutions::day_7::main(input, part),
             Day::Eight => solutions::day_8::main(input, part),
             Day::Nine => solutions::day_9::main(input, part),
+            Day::Ten => solutions::day_10::main(input, part),
 
             _ => Err(UnimplementedSolution(*self, part).into()),
         }
