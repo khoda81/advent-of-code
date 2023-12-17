@@ -107,6 +107,7 @@ impl Day {
             Day::Six => solutions::day_6::main(input, part),
             Day::Seven => solutions::day_7::main(input, part),
             Day::Eight => solutions::day_8::main(input, part),
+            Day::Nine => solutions::day_9::main(input, part),
 
             _ => Err(UnimplementedSolution(*self, part).into()),
         }
