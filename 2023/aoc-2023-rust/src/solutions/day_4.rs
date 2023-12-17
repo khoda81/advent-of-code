@@ -14,7 +14,7 @@ pub fn main<I: BufRead>(input: I, part: Part) -> PuzzleResult {
         })
         .collect::<Result<_, _>>()?;
 
-    let total = match part {
+    let total: u32 = match part {
         Part::One => cards.iter().map(|card| card.evaluate()).sum(),
         Part::Two => {
             let mut wins = vec![1; cards.len()];
@@ -28,7 +28,7 @@ pub fn main<I: BufRead>(input: I, part: Part) -> PuzzleResult {
         }
     };
 
-    Ok(total)
+    Ok(total.into())
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Eq)]

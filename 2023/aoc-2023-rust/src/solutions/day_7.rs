@@ -31,9 +31,9 @@ pub fn main<I: BufRead>(input: I, part: Part) -> PuzzleResult {
 
     hands.sort_by_key(|&(hand, kind, _)| (kind, hand.0));
 
-    let total = (1..).zip(hands).map(|(rank, (_, _, bid))| rank * bid).sum();
+    let total: u32 = (1..).zip(hands).map(|(rank, (_, _, bid))| rank * bid).sum();
 
-    Ok(total)
+    Ok(total.into())
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]

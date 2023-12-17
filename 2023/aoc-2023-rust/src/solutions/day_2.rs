@@ -2,7 +2,7 @@ use anyhow::Ok;
 use regex::Regex;
 use std::io::BufRead;
 
-use crate::{Part, PuzzleOutput, PuzzleResult};
+use crate::{Part, PuzzleResult};
 
 #[derive(Debug)]
 struct Bag {
@@ -31,7 +31,7 @@ pub fn main<I: BufRead>(input: I, part: Part) -> PuzzleResult {
         }
     }
 
-    Ok(PuzzleOutput::try_from(total)?)
+    Ok(total.into())
 }
 
 fn is_possible(bag: &Bag) -> bool {

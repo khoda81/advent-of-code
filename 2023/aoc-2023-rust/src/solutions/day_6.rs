@@ -8,7 +8,7 @@ pub fn main<I: BufRead>(input: I, part: Part) -> PuzzleResult {
     let times = parse_line(lines.next().unwrap()?, part)?;
     let distances = parse_line(lines.next().unwrap()?, part)?;
 
-    let total = times
+    let total: u32 = times
         .into_iter()
         .zip(distances)
         .map(|(time, distance)| {
@@ -18,7 +18,7 @@ pub fn main<I: BufRead>(input: I, part: Part) -> PuzzleResult {
         })
         .product();
 
-    Ok(total)
+    Ok(total.into())
 }
 
 fn parse_line(line: String, part: Part) -> Result<Vec<u64>, anyhow::Error> {

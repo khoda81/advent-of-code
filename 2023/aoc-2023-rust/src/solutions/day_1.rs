@@ -2,7 +2,7 @@ use regex::Regex;
 use std::io::BufRead;
 use thiserror::Error;
 
-use crate::{Part, PuzzleOutput, PuzzleResult};
+use crate::{Part, PuzzleResult};
 
 pub fn main<I: BufRead>(input: I, part: Part) -> PuzzleResult {
     let mut total = 0;
@@ -19,7 +19,7 @@ pub fn main<I: BufRead>(input: I, part: Part) -> PuzzleResult {
         total += num as u32;
     }
 
-    Ok(PuzzleOutput::try_from(total)?)
+    Ok(total.into())
 }
 
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Error)]

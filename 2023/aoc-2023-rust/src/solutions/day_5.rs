@@ -1,11 +1,10 @@
+use crate::{Part, PuzzleResult};
 use std::{
     fmt::Display,
     io::{self, BufRead},
     ops::{ControlFlow as CF, RangeInclusive},
 };
 use thiserror::Error;
-
-use crate::{Part, PuzzleResult};
 
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Error)]
 #[error("there was an un even number of seeds (num seeds: {0})")]
@@ -46,7 +45,7 @@ pub fn main<I: BufRead>(mut input: I, part: Part) -> PuzzleResult {
         .min()
         .expect("no seeds remaining");
 
-    Ok(result)
+    Ok(result.into())
 }
 
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]

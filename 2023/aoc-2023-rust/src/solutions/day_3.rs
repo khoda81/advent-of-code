@@ -2,7 +2,7 @@ use anyhow::Ok;
 use regex::Regex;
 use std::{collections::HashMap, io::BufRead};
 
-use crate::{Part, PuzzleOutput, PuzzleResult};
+use crate::{Part, PuzzleResult};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 enum Object {
@@ -99,7 +99,7 @@ pub fn main<I: BufRead>(input: I, part: Part) -> PuzzleResult {
         total += ratio;
     }
 
-    Ok(PuzzleOutput::try_from(total)?)
+    Ok(total.into())
 }
 
 fn parse_line(line: &str) -> anyhow::Result<Vec<(usize, Object)>> {
