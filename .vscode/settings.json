@@ -3,7 +3,8 @@
   "editor.tabCompletion": "on",
   "diffEditor.codeLens": true,
   "cSpell.words": [
-    "aocd"
+    "aocd",
+    "structopt"
   ],
   "python.analysis.typeCheckingMode": "off"
 }

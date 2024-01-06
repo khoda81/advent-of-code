@@ -1,67 +1,85 @@
-use std::{
-    fmt::Display,
-    fs::File,
-    io::{BufRead, BufReader},
-    path::PathBuf,
-};
+use std::{fmt::Display, io::BufRead};
 
-use anyhow::Context;
-use strum_macros::EnumIter;
+use strum_macros::{Display, EnumIter, EnumString};
 use thiserror::Error;
 
 pub mod solutions;
 
-pub const INPUT_FILES_PATH: &str = r"..\2023";
-
 #[repr(u8)]
-#[derive(Copy, Clone, Debug, Default, PartialEq, Eq, EnumIter)]
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq, EnumIter, EnumString)]
 pub enum Part {
     #[default]
+    #[strum(ascii_case_insensitive)]
     One = 1,
+
+    #[strum(ascii_case_insensitive)]
     Two = 2,
 }
 
 impl Display for Part {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let buf = format!("Part {}", *self as u8);
-        buf.fmt(f)
+        format!("Part {}", *self as u8).fmt(f)
     }
 }
 
 #[repr(u8)]
-#[derive(Copy, Clone, Debug, PartialEq, Eq, EnumIter)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, EnumIter, EnumString)]
 pub enum Day {
-    One = 1,
-    Two = 2,
-    Three = 3,
-    Four = 4,
-    Five = 5,
-    Six = 6,
-    Seven = 7,
-    Eight = 8,
-    Nine = 9,
-    Ten = 10,
-    Eleven = 11,
-    Twelve = 12,
-    Thirteen = 13,
-    Fourteen = 14,
-    Fifteen = 15,
-    Sixteen = 16,
-    Seventeen = 17,
-    Eighteen = 18,
-    Nineteen = 19,
-    Twenty = 20,
-    TwentyOne = 21,
-    TwentyTwo = 22,
-    TwentyThree = 23,
-    TwentyFour = 24,
-    TwentyFive = 25,
+    #[strum(serialize = "1")]
+    Day1 = 1,
+    #[strum(serialize = "2")]
+    Day2 = 2,
+    #[strum(serialize = "3")]
+    Day3 = 3,
+    #[strum(serialize = "4")]
+    Day4 = 4,
+    #[strum(serialize = "5")]
+    Day5 = 5,
+    #[strum(serialize = "6")]
+    Day6 = 6,
+    #[strum(serialize = "7")]
+    Day7 = 7,
+    #[strum(serialize = "8")]
+    Day8 = 8,
+    #[strum(serialize = "9")]
+    Day9 = 9,
+    #[strum(serialize = "10")]
+    Day10 = 10,
+    #[strum(serialize = "11")]
+    Day11 = 11,
+    #[strum(serialize = "12")]
+    Day12 = 12,
+    #[strum(serialize = "13")]
+    Day13 = 13,
+    #[strum(serialize = "14")]
+    Day14 = 14,
+    #[strum(serialize = "15")]
+    Day15 = 15,
+    #[strum(serialize = "16")]
+    Day16 = 16,
+    #[strum(serialize = "17")]
+    Day17 = 17,
+    #[strum(serialize = "18")]
+    Day18 = 18,
+    #[strum(serialize = "19")]
+    Day19 = 19,
+    #[strum(serialize = "20")]
+    Day20 = 20,
+    #[strum(serialize = "21")]
+    Day21 = 21,
+    #[strum(serialize = "22")]
+    Day22 = 22,
+    #[strum(serialize = "23")]
+    Day23 = 23,
+    #[strum(serialize = "24")]
+    Day24 = 24,
+    #[strum(serialize = "25")]
+    Day25 = 25,
 }
 
 impl Display for Day {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let buf = format!("Day {}", self.number());
-        buf.fmt(f)
+        format!("Day {}", *self as u8).fmt(f)
     }
 }
 
@@ -72,45 +90,43 @@ pub type PuzzleResult = anyhow::Result<String>;
 pub struct UnimplementedSolution(Day, Part);
 
 impl Day {
-    pub fn number(self) -> u8 {
-        self as u8
-    }
-
-    pub fn input_path(&self) -> PathBuf {
-        PathBuf::from_iter([INPUT_FILES_PATH, &self.number().to_string(), "input.txt"])
-    }
-
-    pub fn solve(&self, part: Part) -> PuzzleResult {
-        let path = self.input_path();
-        let input_file = File::open(path.clone()).with_context(|| {
-            let invalid_path_msg = "Failed: path had invalid unicode";
-            let path = path.to_str().unwrap_or(invalid_path_msg);
-            let cwd = match std::env::current_dir() {
-                Ok(cwd) => cwd.to_str().unwrap_or(invalid_path_msg).to_string(),
-                Err(err) => format!("Failed: {err}"),
-            };
-
-            format!("failed to open file \"{path}\" (cwd: \"{cwd}\")")
-        })?;
-
-        let buf_reader = BufReader::new(input_file);
-        self.solve_with_input(buf_reader, part)
-    }
-
-    fn solve_with_input<I: BufRead>(&self, input: I, part: Part) -> PuzzleResult {
+    pub fn solve<I: BufRead>(&self, input: I, part: Part) -> PuzzleResult {
         match self {
-            Day::One => solutions::day_1::main(input, part),
-            Day::Two => solutions::day_2::main(input, part),
-            Day::Three => solutions::day_3::main(input, part),
-            Day::Four => solutions::day_4::main(input, part),
-            Day::Five => solutions::day_5::main(input, part),
-            Day::Six => solutions::day_6::main(input, part),
-            Day::Seven => solutions::day_7::main(input, part),
-            Day::Eight => solutions::day_8::main(input, part),
-            Day::Nine => solutions::day_9::main(input, part),
-            Day::Ten => solutions::day_10::main(input, part),
+            Day::Day1 => solutions::day_1::main(input, part),
+            Day::Day2 => solutions::day_2::main(input, part),
+            Day::Day3 => solutions::day_3::main(input, part),
+            Day::Day4 => solutions::day_4::main(input, part),
+            Day::Day5 => solutions::day_5::main(input, part),
+            Day::Day6 => solutions::day_6::main(input, part),
+            Day::Day7 => solutions::day_7::main(input, part),
+            Day::Day8 => solutions::day_8::main(input, part),
+            Day::Day9 => solutions::day_9::main(input, part),
+            Day::Day10 => solutions::day_10::main(input, part),
+            Day::Day11 => solutions::day_11::main(input, part),
 
             _ => Err(UnimplementedSolution(*self, part).into()),
         }
     }
+}
+
+#[derive(Debug, PartialEq, Eq, Copy, Clone, EnumString, Display)]
+pub enum Year {
+    #[strum(serialize = "2015")]
+    Year2015 = 2015,
+    #[strum(serialize = "2016")]
+    Year2016 = 2016,
+    #[strum(serialize = "2017")]
+    Year2017 = 2017,
+    #[strum(serialize = "2018")]
+    Year2018 = 2018,
+    #[strum(serialize = "2019")]
+    Year2019 = 2019,
+    #[strum(serialize = "2020")]
+    Year2020 = 2020,
+    #[strum(serialize = "2021")]
+    Year2021 = 2021,
+    #[strum(serialize = "2022")]
+    Year2022 = 2022,
+    #[strum(serialize = "2023")]
+    Year2023 = 2023,
 }
