@@ -1,146 +1,212 @@
 use anyhow::Context;
 use aoc_2023::{Day, Part, Year};
-use config::{Config, File};
-use std::{fs, io::BufReader, path::PathBuf};
+use std::{
+    fs,
+    io::{BufRead, BufReader, Cursor},
+    path::PathBuf,
+};
 use structopt::StructOpt;
+use thiserror::Error;
 
 #[derive(Debug, StructOpt)]
 #[structopt(name = "aoc-cli", about = "Advent of Code CLI")]
 struct Args {
-    #[structopt(long, default_value = "../", parse(from_os_str))]
+    #[structopt(long, default_value = "..", parse(from_os_str))]
     inputs_dir: PathBuf,
 
-    #[structopt(long, default_value = "../secrets.toml", parse(from_os_str))]
-    secrets_file: PathBuf,
-
     #[structopt(subcommand)]
-    cmd: Command,
+    command: Command,
 }
 
 #[derive(Debug, StructOpt)]
 enum Command {
-    #[structopt(name = "get-input")]
-    GetInput {
-        #[structopt(short, long)]
+    #[structopt(name = "input", about = "Get input for a specific date")]
+    Input {
+        #[structopt(name = "YEAR")]
         year: Year,
 
-        #[structopt(short, long)]
+        #[structopt(name = "DAY")]
         day: Day,
     },
 
-    #[structopt(name = "solve")]
+    #[structopt(name = "solve", about = "Solve a specific day and year and part")]
     Solve {
-        #[structopt(short, long)]
+        #[structopt(name = "YEAR")]
         year: Year,
 
-        #[structopt(short, long)]
+        #[structopt(name = "DAY")]
         day: Day,
 
         #[structopt(short, long)]
-        part: Part,
+        no_part1: bool,
+
+        #[structopt(short, long)]
+        no_part2: bool,
     },
 }
 
-async fn get_input(
-    inputs_dir: PathBuf,
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Error)]
+enum InvalidToken {
+    #[error("consider replacing \"TOKEN\" in the .env file with your advent of code session key")]
+    DefaultToken,
+}
+
+async fn download_input(
     year: Year,
     day: Day,
-    secrets: config::Config,
-) -> anyhow::Result<()> {
-    let cookie = secrets
-        .get::<&str>("aoc.token")
-        .context("cookie not found in config")?;
-
+    session_key: String,
+) -> Result<String, anyhow::Error> {
+    let cookie = format!("session={session_key}");
     let client = reqwest::Client::builder().build()?;
     let mut headers = reqwest::header::HeaderMap::new();
     headers.insert("Cookie", cookie.parse()?);
 
     let request_url = format!(
         "https://adventofcode.com/{}/day/{}/input",
-        year as u8, day as u8
+        year as u32, day as u8
     );
 
     let request = client
         .request(reqwest::Method::GET, &request_url)
         .headers(headers);
 
-    let response = request.send().await?;
-    let body = response.text().await?;
+    let body = request.send().await?.error_for_status()?.text().await?;
 
-    println!("{}", body);
-
-    // Save the input to the specified output path
-    let output_file = get_puzzle_input_path(inputs_dir, year, day);
-
-    let output_dir = output_file
-        .parent()
-        .expect("the input file is not stored at root");
-
-    tokio::fs::create_dir_all(&output_dir).await?;
-    tokio::fs::write(&output_file, body).await?;
-
-    println!("Input saved to: {}", output_file.display());
-
-    Ok(())
+    Ok(body)
 }
 
-fn get_puzzle_input_path(inputs_dir: PathBuf, year: Year, day: Day) -> PathBuf {
-    inputs_dir
-        .join((year as u32).to_string())
-        .join((day as u8).to_string())
-        .join("input.txt")
+enum Input {
+    Cached {
+        file: Box<dyn BufRead>,
+        path: PathBuf,
+    },
+    Downloaded(String),
 }
 
-fn solve(inputs_dir: PathBuf, year: Year, day: Day, part: Part) -> Result<(), anyhow::Error> {
-    let path = get_puzzle_input_path(inputs_dir, year, day);
-
-    let input_file = fs::File::open(path.clone()).with_context(|| {
-        let invalid_path_msg = "Failed: path had invalid unicode";
-        let path = path.to_str().unwrap_or(invalid_path_msg);
-
-        format!("failed to open file \"{path}\"")
-    })?;
-
-    let input = BufReader::new(input_file);
-
-    println!("Solving Advent of Code {year}/{day} - Part {part:?}");
-    if year == Year::Year2023 {
-        match day.solve(input, part) {
-            Ok(result) => println!("{part}: {result}"),
-            Err(err) => eprintln!("Error solving {part}: {err}"),
+impl Input {
+    fn into_bufread(self) -> Box<dyn BufRead> {
+        match self {
+            Input::Cached { file, .. } => file,
+            Input::Downloaded(string) => Box::new(Cursor::new(string)),
         }
-    } else {
-        panic!("only solutions of year 2023 are supported for now!");
-    };
+    }
+}
 
-    Ok(())
+struct App {
+    args: Args,
+    config: config::Config,
+}
+
+impl App {
+    async fn run(self) -> anyhow::Result<()> {
+        match self.args.command {
+            Command::Input { year, day } => {
+                let input = self.get_input(year, day).await?;
+                if let Input::Cached { path, .. } = &input {
+                    println!("Using cached value at {}", path.display());
+                }
+
+                for line in input.into_bufread().lines() {
+                    println!("{}", line?);
+                }
+            }
+
+            Command::Solve {
+                year,
+                day,
+                no_part1,
+                no_part2,
+            } => {
+                if !no_part1 {
+                    self.solve_part(year, day, Part::One).await?;
+                }
+
+                if !no_part2 {
+                    self.solve_part(year, day, Part::Two).await?;
+                }
+            }
+        };
+
+        // TODO implement submitting
+
+        Ok(())
+    }
+
+    async fn solve_part(&self, year: Year, day: Day, part: Part) -> anyhow::Result<()> {
+        print!("Solving Advent of Code {year}/{day} - Part {part:?}: ");
+        let answer = self.solve(year, day, part).await?;
+        println!("{answer}");
+        Ok(())
+    }
+
+    async fn get_input(&self, year: Year, day: Day) -> anyhow::Result<Input> {
+        // TODO: make the cache user aware
+        let session_key = self
+            .config
+            .get::<String>("aoc_session")
+            .context("Consider setting the AOC_SESSION env var")?;
+
+        if session_key == "TOKEN" {
+            Err(InvalidToken::DefaultToken)?;
+        }
+
+        // Save the input to the specified output path
+        let path: PathBuf = self.get_cache_path(year, day);
+
+        if let Ok(file) = fs::File::open(&path).map(BufReader::new).map(Box::new) {
+            return Ok(Input::Cached { file, path });
+        }
+
+        if path.is_dir() {
+            let _ = tokio::fs::remove_dir_all(&path).await;
+        }
+
+        let body = download_input(year, day, session_key).await?;
+
+        if let Some(output_dir) = path.parent() {
+            tokio::fs::create_dir_all(&output_dir).await?;
+        }
+
+        tokio::fs::write(&path, &body).await?;
+
+        Ok(Input::Downloaded(body))
+    }
+
+    async fn solve(&self, year: Year, day: Day, part: Part) -> anyhow::Result<String> {
+        let input = self.get_input(year, day).await?;
+        let input = input.into_bufread();
+
+        if year == Year::Year2023 {
+            day.solve(input, part)
+        } else {
+            panic!("only solutions of year 2023 are supported for now!");
+        }
+    }
+
+    fn get_cache_path(&self, year: Year, day: Day) -> PathBuf {
+        self.args
+            .inputs_dir
+            .join((year as u32).to_string())
+            .join((day as u8).to_string())
+            .join("input.txt")
+    }
 }
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> anyhow::Result<()> {
     let args = Args::from_args();
 
-    // Load configuration from aoc_config.toml
-    let config_file_str = args
-        .secrets_file
-        .to_str()
-        .context("invalid UTF-8 in config path.")?;
+    match dotenv::dotenv() {
+        Ok(path) => path
+            .to_str()
+            .map(|path_str| println!("Loaded environment variables from {path_str}")),
 
-    match args.cmd {
-        Command::GetInput { year, day } => {
-            get_input(
-                args.inputs_dir,
-                year,
-                day,
-                Config::builder()
-                    .add_source(File::with_name(config_file_str))
-                    .build()?,
-            )
-            .await?
-        }
+        Err(err) => return Err(err.into()),
+    };
 
-        Command::Solve { year, day, part } => solve(args.inputs_dir, year, day, part)?,
-    }
+    let config = config::Config::builder()
+        .add_source(config::Environment::default())
+        .build()?;
 
-    Ok(())
+    App { args, config }.run().await
 }
