@@ -11,7 +11,7 @@ use thiserror::Error;
 #[derive(Debug, StructOpt)]
 #[structopt(name = "aoc-cli", about = "Advent of Code CLI")]
 struct Args {
-    #[structopt(long, default_value = "..", parse(from_os_str))]
+    #[structopt(long, default_value = "../input", parse(from_os_str))]
     inputs_dir: PathBuf,
 
     #[structopt(subcommand)]
@@ -187,8 +187,7 @@ impl App {
         self.args
             .inputs_dir
             .join((year as u32).to_string())
-            .join((day as u8).to_string())
-            .join("input.txt")
+            .join(format!("{}.txt", day as u8))
     }
 }
 
